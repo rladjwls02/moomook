@@ -31,29 +31,26 @@ class RecommendationControllerTest {
     void recommendReturnsCandidates() throws Exception {
         RecommendationRequest request = new RecommendationRequest(
                 "추천",
+                2,
+                4,
+                20,
+                15000,
+                true,
                 null,
                 null,
                 null,
                 null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
+                3
         );
-
-        RecommendationCandidate candidate = RecommendationCandidate.builder()
-                .menuId(1L)
-                .name("김치볶음밥")
-                .price(7000)
-                .reasons(List.of("인기 메뉴"))
-                .score(12)
-                .build();
-
         RecommendationResponse response = RecommendationResponse.builder()
                 .customerInput("추천")
-                .candidates(List.of(candidate))
+                .candidates(List.of(RecommendationCandidate.builder()
+                        .menuId(5L)
+                        .name("비빔밥")
+                        .price(11000)
+                        .reasons(List.of("선호 태그 일치"))
+                        .score(30)
+                        .build()))
                 .build();
 
         when(recommendationService.recommend(any(RecommendationRequest.class))).thenReturn(response);
@@ -63,7 +60,7 @@ class RecommendationControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customerInput").value("추천"))
-                .andExpect(jsonPath("$.candidates[0].menuId").value(1))
-                .andExpect(jsonPath("$.candidates[0].score").value(12));
+                .andExpect(jsonPath("$.candidates[0].menuId").value(5L))
+                .andExpect(jsonPath("$.candidates[0].name").value("비빔밥"));
     }
 }
