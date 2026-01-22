@@ -17,6 +17,7 @@ import com.safhao.moomook.dto.RecommendRequest;
 import com.safhao.moomook.dto.RecommendResponse;
 import com.safhao.moomook.engine.RecommendationEngine;
 import com.safhao.moomook.llm.LlmGateway;
+import com.safhao.moomook.llm.LlmProperties;
 import com.safhao.moomook.repository.ErrorLogRepository;
 import com.safhao.moomook.repository.MenuRepository;
 import com.safhao.moomook.repository.RecommendationClickLogRepository;
@@ -40,6 +41,7 @@ public class RecommendationService {
     private final RecommendationClickLogRepository recommendationClickLogRepository;
     private final ErrorLogRepository errorLogRepository;
     private final LlmGateway llmGateway;
+    private final LlmProperties llmProperties;
     private final RecommendationEngine recommendationEngine = new RecommendationEngine();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -49,7 +51,8 @@ public class RecommendationService {
                                  RecommendationLogRepository recommendationLogRepository,
                                  RecommendationClickLogRepository recommendationClickLogRepository,
                                  ErrorLogRepository errorLogRepository,
-                                 LlmGateway llmGateway) {
+                                 LlmGateway llmGateway,
+                                 LlmProperties llmProperties) {
         this.storeRepository = storeRepository;
         this.tableRepository = tableRepository;
         this.menuRepository = menuRepository;
@@ -57,6 +60,7 @@ public class RecommendationService {
         this.recommendationClickLogRepository = recommendationClickLogRepository;
         this.errorLogRepository = errorLogRepository;
         this.llmGateway = llmGateway;
+        this.llmProperties = llmProperties;
     }
 
     public RecommendResponse recommend(String storeSlug, String tableCode, RecommendRequest request) {
@@ -152,8 +156,16 @@ public class RecommendationService {
         log.setUserText(Optional.ofNullable(userText).orElse(""));
         log.setExtractedConstraints(writeJson(extracted.getConstraints()));
         log.setRecommendedMenuIds(writeJson(menus.stream().map(Menu::getId).toList()));
-        log.setModelProvider("dummy");
-        log.setModelName("fallback-llm");
+        String apiKey = Optional.ofNullable(llmProperties.getApiKey()).orElse("");
+        boolean hasRealLlm = !apiKey.isBlank();
+        String provider = hasRealLlm
+            ? Optional.ofNullable(llmProperties.getProvider()).filter(value -> !value.isBlank()).orElse("gemini")
+            : "dummy";
+        String model = hasRealLlm
+            ? Optional.ofNullable(llmProperties.getModel()).filter(value -> !value.isBlank()).orElse("gemini-1.5-flash")
+            : "fallback-llm";
+        log.setModelProvider(provider);
+        log.setModelName(model);
         log.setLatencyMs(latencyMs);
         recommendationLogRepository.save(log);
     }
