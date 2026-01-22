@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
+    @DisplayName("설명에 없는 메뉴 ID가 있어도 존재하는 메뉴만 추천한다")
     @Test
     void recommend_doesNotIncludeUnknownMenuIds_whenExplanationsContainNonexistentId() {
         // given
@@ -75,6 +77,7 @@ class RecommendationServiceTest {
             "DB에 존재하지 않는 메뉴 ID가 추천에 포함되었습니다.");
     }
 
+    @DisplayName("LLM 조건 추출 실패 시 폴백 제약을 사용한다")
     @Test
     void recommend_usesFallbackConstraints_whenLlmConstraintExtractionFails() {
         // given
