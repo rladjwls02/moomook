@@ -8,36 +8,39 @@ import org.junit.jupiter.api.Test;
 
 class RecommendationEngineTest {
     @Test
-    void filtersByAllergensAndIngredients() {
+    void recommend_excludesMenusWithAllergens_whenAllergyConstraintsProvided() {
+        // given
         RecommendationEngine engine = new RecommendationEngine();
-        Menu safeMenu = menu(1L, "안전", List.of("면"), List.of("우유"));
+        Menu safeMenu = menu(1L, "안전", List.of("우유"), List.of("면"));
         Menu riskyMenu = menu(2L, "위험", List.of("땅콩"), List.of("마늘"));
 
         ConstraintsDto constraints = ConstraintsDto.defaultConstraints();
         constraints.getAllergens().add("땅콩");
-        constraints.getExcludeIngredients().add("마늘");
 
-        List<Menu> filtered = engine.filterMenus(List.of(safeMenu, riskyMenu), constraints);
+        // when
+        List<Menu> filtered = engine.recommend(List.of(safeMenu, riskyMenu), constraints, 5);
 
-        Assertions.assertEquals(1, filtered.size());
-        Assertions.assertEquals("안전", filtered.get(0).getName());
+        // then
+        Assertions.assertEquals(1, filtered.size(), "알레르기 조건과 일치하는 메뉴는 제외되어야 합니다.");
+        Assertions.assertEquals("안전", filtered.get(0).getName(), "알레르기 메뉴가 제거되지 않았습니다.");
     }
 
     @Test
-    void scoresAndSelectsTopMenus() {
+    void recommend_excludesMenusMarkedUnavailable_whenAvailabilityIsFalse() {
+        // given
         RecommendationEngine engine = new RecommendationEngine();
-        Menu first = menu(1L, "첫번째", List.of("혼밥"), List.of());
-        Menu second = menu(2L, "두번째", List.of("든든"), List.of());
-        first.setPriorityScore(10);
-        second.setPriorityScore(1);
+        Menu availableMenu = menu(1L, "판매중", List.of(), List.of());
+        Menu unavailableMenu = menu(2L, "품절", List.of(), List.of());
+        unavailableMenu.setAvailable(false);
 
         ConstraintsDto constraints = ConstraintsDto.defaultConstraints();
-        constraints.getDesiredTags().add("혼밥");
 
-        List<Menu> recommended = engine.recommend(List.of(first, second), constraints, 1);
+        // when
+        List<Menu> recommended = engine.recommend(List.of(availableMenu, unavailableMenu), constraints, 5);
 
-        Assertions.assertEquals(1, recommended.size());
-        Assertions.assertEquals("첫번째", recommended.get(0).getName());
+        // then
+        Assertions.assertEquals(1, recommended.size(), "판매중이 아닌 메뉴는 추천에서 제외되어야 합니다.");
+        Assertions.assertEquals("판매중", recommended.get(0).getName(), "품절 메뉴가 추천에 포함되었습니다.");
     }
 
     private Menu menu(Long id, String name, List<String> allergens, List<String> ingredients) {
