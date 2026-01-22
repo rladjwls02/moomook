@@ -4,9 +4,11 @@ import com.safhao.moomook.domain.Menu;
 import com.safhao.moomook.dto.ConstraintsDto;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class RecommendationEngineTest {
+    @DisplayName("알레르기 제약이 있으면 해당 알레르기 메뉴는 제외된다")
     @Test
     void recommend_excludesMenusWithAllergens_whenAllergyConstraintsProvided() {
         // given
@@ -25,6 +27,7 @@ class RecommendationEngineTest {
         Assertions.assertEquals("안전", filtered.get(0).getName(), "알레르기 메뉴가 제거되지 않았습니다.");
     }
 
+    @DisplayName("판매 불가 메뉴는 추천에서 제외된다")
     @Test
     void recommend_excludesMenusMarkedUnavailable_whenAvailabilityIsFalse() {
         // given
