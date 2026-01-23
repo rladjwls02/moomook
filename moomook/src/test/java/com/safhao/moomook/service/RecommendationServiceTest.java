@@ -9,6 +9,7 @@ import com.safhao.moomook.dto.GenerateExplanationsResponse;
 import com.safhao.moomook.dto.RecommendRequest;
 import com.safhao.moomook.dto.RecommendResponse;
 import com.safhao.moomook.llm.LlmGateway;
+import com.safhao.moomook.llm.LlmProperties;
 import com.safhao.moomook.repository.ErrorLogRepository;
 import com.safhao.moomook.repository.MenuRepository;
 import com.safhao.moomook.repository.RecommendationClickLogRepository;
@@ -43,8 +44,9 @@ class RecommendationServiceTest {
         RecommendationClickLogRepository recommendationClickLogRepository = mock(RecommendationClickLogRepository.class);
         ErrorLogRepository errorLogRepository = mock(ErrorLogRepository.class);
         LlmGateway llmGateway = mock(LlmGateway.class);
+        LlmProperties llmProperties = new LlmProperties();
         RecommendationService service = new RecommendationService(storeRepository, tableRepository, menuRepository,
-            recommendationLogRepository, recommendationClickLogRepository, errorLogRepository, llmGateway);
+            recommendationLogRepository, recommendationClickLogRepository, errorLogRepository, llmGateway, llmProperties);
 
         Store store = storeWithId(10L, "store");
         Menu menuA = menuWithId(1L, "김치찌개");
@@ -88,8 +90,9 @@ class RecommendationServiceTest {
         RecommendationClickLogRepository recommendationClickLogRepository = mock(RecommendationClickLogRepository.class);
         ErrorLogRepository errorLogRepository = mock(ErrorLogRepository.class);
         LlmGateway llmGateway = mock(LlmGateway.class);
+        LlmProperties llmProperties = new LlmProperties();
         RecommendationService service = new RecommendationService(storeRepository, tableRepository, menuRepository,
-            recommendationLogRepository, recommendationClickLogRepository, errorLogRepository, llmGateway);
+            recommendationLogRepository, recommendationClickLogRepository, errorLogRepository, llmGateway, llmProperties);
 
         Store store = storeWithId(20L, "fallback-store");
         Menu menu = menuWithId(3L, "라면");

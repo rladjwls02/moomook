@@ -1,7 +1,9 @@
 package com.safhao.moomook.llm;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+@Component
 @ConfigurationProperties(prefix = "llm")
 public class LlmProperties {
     private String provider = "dummy";
