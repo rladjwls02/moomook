@@ -7,11 +7,6 @@ import com.safhao.moomook.dto.ExtractConstraintsResponse;
 import com.safhao.moomook.dto.GenerateExplanationsResponse;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
-
-@Component
-@ConditionalOnMissingBean(LlmGateway.class)
 public class DummyLlmGateway implements LlmGateway {
     @Override
     public ExtractConstraintsResponse extractConstraints(String userText) {
